@@ -1,0 +1,139 @@
+create table riwi_supplier(
+	id_supplier serial primary key,
+	supplier_name varchar(150) not null,
+	supplier_city varchar (100) not null
+);
+
+create table riwi_warehouse (
+	id_warehouse serial primary key,
+	warehouse_name varchar(100)not null,
+	warehouse_city varchar(100) not null
+);
+
+create table riwi_product (
+	id_product serial primary key,
+	product_name varchar(150) not null,
+	unit_price float not null,
+	id_category int not null
+);
+
+
+create table riwi_inventory (
+	id_inventory serial primary key,
+	inventory_name varchar(150) not null,
+	id_warehouse int not null,
+	id_product int not null,
+	product_quantity int,
+	id_transaction int not null
+);
+
+
+create table riwi_transaction (
+	id_transaction serial primary key,
+	movement_date date not null,
+	product_id int not null,
+	quantity int not null,
+	transaction_price float not null,
+	movement_type varchar(30)not null,
+	warehouse_id int not null
+);
+
+create table riwi_product_supplier (
+	product_id int not null,
+	supplier_id int not null
+);
+
+
+alter table riwi_product_supplier 
+add constraint fk_product_supplier
+foreign key (product_id)
+references riwi_product (id_product);
+
+alter table riwi_product_supplier 
+add constraint fk_supplier_product
+foreign key (supplier_id)
+references riwi_supplier (id_supplier)
+
+alter table riwi_inventory 
+add constraint fk_inventory_warehouse
+foreign key (id_warehouse)
+references riwi_warehouse (id_warehouse);
+
+alter table riwi_inventory 
+add constraint fk_inventory_product
+foreign key (id_product)
+references riwi_product(id_product);
+
+alter table riwi_inventory 
+add constraint fk_inventory_transaction
+foreign key (id_transaction)
+references riwi_transaction(id_transaction);
+
+alter table riwi_transaction 
+add constraint fk_transaction_product
+foreign key (product_id)
+references riwi_product(id_product);
+
+alter table riwi_transaction 
+add constraint fk_transaction_warehouse
+foreign key (warehouse_id)
+references riwi_warehouse(id_warehouse);
+
+insert into riwi_supplier (supplier_name,supplier_city)
+values
+	('Aceros del Norte S.A.S','Cartagena'),
+	('INDUSTRIALES SAS','Barranquilla'),
+	('Suministros Global SAS','Santa Marta')
+	
+insert into riwi_warehouse (warehouse_name,warehouse_city)
+values 
+	('Bodega Costa','Santa Marta'),
+	('Centro Logistico Norte', 'Cartagena'),
+	('Bodega Central','Barranquila')
+	
+
+	
+insert into riwi_product (product_name,unit_price,category)
+values
+	('Disco de Corte 4.5',115388,1)
+	('Electrodo E6013',35506,2)
+	('Guantes de Nitrilo')
+
+select dr."SupplierName" ,dr."ProductName" ,dr."UnitPrice", dr."Category"   from dataset_riwisupply dr 
+
+select dr."SupplierName" from dataset_riwisupply dr where dr."SupplierName" ilike 'Suministros %'
+
+update dataset_riwisupply dr 
+set "SupplierName" = 'INDUSTRIALES SAS'
+where dr."SupplierName" ilike 'industriales%'
+
+insert into riwi_product (product_name,unit_price,category)
+select "ProductName","UnitPrice" ,"Category"
+from dataset_riwisupply;
+
+select dr."ProductName",dr."SupplierName" from dataset_riwisupply dr 
+
+/* First Query */
+select rp.product_name, ri.product_quantity
+from riwi_inventory ri 
+inner join riwi_product rp 
+on ri.id_product = rp.id_product 
+
+
+/* Second Query */
+
+select rt.movement_type, rp.product_name
+from riwi_transaction rt 
+inner join riwi_product rp 
+on rt.product_id = rp.id_product 
+
+/* query number 3 */
+
+select rt.product_id, rps.supplier_id
+from riwi_product_supplier rps
+inner join riwi_transaction rt 
+on rps.product_id = rt.product_id and rt.movement_type = 'IN'
+
+
+
+
